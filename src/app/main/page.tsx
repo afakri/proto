@@ -1,14 +1,15 @@
+
 'use client'
 import CustomNode from '@/components/CustomNode/CustomNode';
-import { DialogHeader, DialogFooter } from '@/components/ui/dialog';
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog';
-import { Input } from 'postcss';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useStateValue } from '@/components/GlobalContext';
+import { initialState, reducer } from '@/components/reducer';
+
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import ReactFlow, { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, MarkerType, MiniMap } from 'reactflow';
 
 import 'reactflow/dist/style.css';
 
-const initialNodes = [
+export const initialNodes = [
     {
         id: '1', type: 'CustomNode', position: { x: 0, y: 600 }, data: {
             type: 'Bet'
@@ -20,7 +21,7 @@ const initialNodes = [
 
     },
     {
-        id: '2', type: 'CustomNode', position: { x: 900, y: 300 }, data: {
+        id: '2', type: 'CustomNode', position: { x: 900, y: 50 }, data: {
             type: 'Work'
             , emoji: '🧰'
             , title: 'Launch push notifications',
@@ -30,7 +31,7 @@ const initialNodes = [
 
     },
     {
-        id: '3', type: 'CustomNode', position: { x: 900, y: 600 }, data: {
+        id: '3', type: 'CustomNode', position: { x: 900, y: 450 }, data: {
             type: 'Work'
             , emoji: '🧰'
             , title: 'Launch push notifications',
@@ -109,73 +110,24 @@ const initialEdges = [
 
 export default function Page() {
     const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
-    const [nodes, setNodes] = useState(initialNodes);
+    const [{ items }, dispatch] = useStateValue();
     const [edges, setEdges] = useState(initialEdges);
 
-    const onNodesChange = useCallback(
-        (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-        [],
-    );
-    const onEdgesChange = useCallback(
-        (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-        [],
-    );
-    const onConnect = useCallback(
-        (connection) => setEdges((eds) => addEdge(connection, eds)),
-        [setEdges]
-    );
-
-    const onNodeClick = (e, node) => {
-        console.log(node)
-    }
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="outline">Edit Profile</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Edit profile</DialogTitle>
-                        <DialogDescription>
-                            Make changes to your profile here. Click save when you're done.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                                Name
-                            </Label>
-                            <Input id="name" value="Pedro Duarte" className="col-span-3" />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="username" className="text-right">
-                                Username
-                            </Label>
-                            <Input id="username" value="@peduarte" className="col-span-3" />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit">Save changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
             <ReactFlow
                 nodeTypes={nodeTypes}
-                nodes={nodes}
+                nodes={items}
                 edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onNodeClick={onNodeClick}
                 fitView
             >
+
                 <Background className='bg-slate-200' color='black' />
                 <MiniMap />
                 <Controls />
             </ReactFlow>
 
-        </div>
+        </div >
     );
 }
